@@ -1,9 +1,10 @@
-FROM jenkins/jenkins:lts-jdk11
+FROM python:3.11
 
-USER root
-# ติดตั้ง Docker CLI
-RUN apt update && curl -fsSL https://get.docker.com | sh
-# ให้ user jenkins ใช้ docker ได้
-RUN usermod -aG docker jenkins
+WORKDIR /usr/src/app
 
-USER jenkins
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
