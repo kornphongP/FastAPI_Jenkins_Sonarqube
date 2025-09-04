@@ -64,7 +64,7 @@ pipeline {
                 sh '''
                     docker run -d \
                         --name fastapi-app \
-                        -p 8000:8000 \
+                        -p 8081:8000 \
                         fastapi-app:latest \
                         uvicorn app.main:app --host 0.0.0.0 --port 8000
                 '''
