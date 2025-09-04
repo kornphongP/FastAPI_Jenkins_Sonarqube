@@ -24,7 +24,7 @@ pipeline {
                 // ติดตั้ง dependencies
                 sh 'pip install --upgrade pip'
                 sh 'pip install -r requirements.txt'
-                sh 'pip install coverage pytest sonar-scanner'
+                sh 'pip install coverage pytest'
                 
                 // รัน unit test และ generate coverage report
                 sh 'PYTHONPATH=. pytest --cov=app tests/ --cov-report=xml:coverage.xml'
