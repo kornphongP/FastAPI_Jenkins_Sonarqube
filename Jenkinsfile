@@ -42,6 +42,7 @@ pipeline {
                                 -Dsonar.sources=app \
                                 -Dsonar.host.url=http://host.docker.internal:9001 \
                                 -Dsonar.login=${SONARQUBE} \
+                                -Dsonar.branch.name=${GIT_BRANCH}
                         """
                     }
                 }
