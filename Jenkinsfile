@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker { 
             image 'python:3.11' 
-            args '-u root:root'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
 
@@ -21,7 +21,7 @@ pipeline {
             steps {
                 sh 'pip install --upgrade pip'
                 sh 'pip install -r requirements.txt'
-                sh 'pip install coverage pytest'
+                sh 'pip install sonar-scanner coverage pytest'
             }
         }
 
@@ -35,20 +35,13 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    // ตรวจสอบว่า docker สามารถเรียกได้
-                    sh 'docker --version'
-
-                    // รัน SonarScanner CLI ผ่าน Docker
-                    sh """
-                    docker run --rm \
-                      -v "E:\\work_unv\\mobile_dev\\fast_api_jenkins_sonarqube:/usr/src" \
-                      -w /usr/src \
-                      sonarsource/sonar-scanner-cli \
+                   sh '''
+                   sonar-scanner \
                       -Dsonar.projectKey=fast-api-jenkins-sonarqube \
-                      -Dsonar.sources=app \
+                      -Dsonar.sources=. \
                       -Dsonar.host.url=http://host.docker.internal:9001 \
-                      -Dsonar.login=$SONARQUBE
-                    """
+                      -Dsonar.token=sqp_24e637ccced59d7a8c88d123f73f731e9c30cc05
+                   '''
                 }
             }
         }
