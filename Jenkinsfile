@@ -9,7 +9,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/<username>/<repo>.git'
+                git branch: 'main', url: 'https://github.com/kornphongP/FastAPI_Jenkins_Sonarqube.git'
             }
         }
 
@@ -42,7 +42,6 @@ pipeline {
                                 -Dsonar.sources=. \
                                 -Dsonar.host.url=http://host.docker.internal:9000 \
                                 -Dsonar.login=${SONARQUBE} \
-                                -Dsonar.python.coverage.reportPaths=coverage.xml
                         """
                     }
                 }
