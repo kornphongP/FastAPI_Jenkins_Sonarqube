@@ -34,16 +34,11 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQubeServer') {
-                    sh 'sonar-scanner \
-                        -Dsonar.projectKey=fast-api-jenkins-sonarqube \
-                        -Dsonar.sources=app \
-                        -Dsonar.host.url=$SONAR_HOST_URL \
-                        -Dsonar.login=$SONARQUBE'
+                withSonarQubeEnv('SonarQubeServer') {  // ✅ ชื่อ SonarQube server ที่ตั้งค่าใน Jenkins
+                    sh 'sonar-scanner -Dsonar.projectKey=fast-api-jenkins-sonarqube -Dsonar.sources=app -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONARQUBE'
                 }
             }
         }
-
 
         stage('Build Docker Image') {
             steps {
