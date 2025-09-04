@@ -54,7 +54,13 @@ pipeline {
             steps {
                 sh 'docker stop fastapi-app || true'
                 sh 'docker rm fastapi-app || true'
-                sh 'docker run -d --name fastapi-app -p 8000:8000 fastapi-app:latest'
+                sh '''
+                    docker run -d \
+                        --name fastapi-app \
+                        -p 8000:8000 \
+                        fastapi-app:latest \
+                        uvicorn app.main:app --host 0.0.0.0 --port 8000
+                '''
             }
         }
     }
