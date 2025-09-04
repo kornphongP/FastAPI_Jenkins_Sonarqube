@@ -21,7 +21,7 @@ pipeline {
             steps {
                 sh 'pip install --upgrade pip'
                 sh 'pip install -r requirements.txt'
-                sh 'pip install sonar-scanner coverage pytest'
+                sh 'pip install coverage pytest'
             }
         }
 
@@ -40,7 +40,7 @@ pipeline {
                           -v E:\\work_unv\\mobile_dev\\fast_api_jenkins_sonarqube:/usr/src \
                           sonarsource/sonar-scanner-cli \
                           -Dsonar.projectKey=fast-api-jenkins-sonarqube \
-                          -Dsonar.sources=app \
+                          -Dsonar.sources=:/usr/src/app \
                           -Dsonar.host.url=http://host.docker.internal:9001 \
                           -Dsonar.login=$SONARQUBE
                     '''
