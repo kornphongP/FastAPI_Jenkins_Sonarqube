@@ -38,8 +38,8 @@ pipeline {
                     docker.image('sonarsource/sonar-scanner-cli').inside {
                         sh """
                             sonar-scanner \
-                                -Dsonar.projectKey=fastapi-app \
-                                -Dsonar.sources=. \
+                                -Dsonar.projectKey=fast-api-jenkins-sonarqube \
+                                -Dsonar.sources=app \
                                 -Dsonar.host.url=http://host.docker.internal:9001 \
                                 -Dsonar.login=${SONARQUBE} \
                         """
