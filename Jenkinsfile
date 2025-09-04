@@ -1,13 +1,8 @@
 pipeline {
-    agent {
-        docker { 
-            image 'python:3.11' 
-            args '-u 0 -v /var/run/docker.sock:/var/run/docker.sock'  // ✅ mount docker socket to run docker commands
-        }
-    }
+    agent any  // ใช้ Jenkins node ที่มี Docker CLI
 
     environment {
-        SONARQUBE = credentials('sonar-token')   // ✅ token จาก Jenkins Credentials
+        SONARQUBE = credentials('sonar-token')   // token จาก Jenkins Credentials
     }
 
     stages {
@@ -17,16 +12,17 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                sh 'python -m pip install --upgrade pip --break-system-packages'
-                sh 'python -m pip install -r requirements.txt --break-system-packages'
-                sh 'python -m pip install coverage pytest --break-system-packages'
+        stage('Install Dependencies & Run Tests') {
+            agent {
+                docker {
+                    image 'python:3.11'
+                    args '-u root:root'   // รันเป็น root จะติดตั้ง pip ได้
+                }
             }
-        }
-
-        stage('Run Tests & Coverage') {
             steps {
+                sh 'pip install --upgrade pip'
+                sh 'pip install -r requirements.txt'
+                sh 'pip install coverage pytest'
                 sh 'PYTHONPATH=. pytest --cov=app tests/ --cov-report=xml:coverage.xml'
             }
         }
@@ -34,6 +30,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
+                    // ใช้ Docker image ของ SonarScanner แยกออกจาก Python container
                     docker.image('sonarsource/sonar-scanner-cli').inside {
                         sh """
                             sonar-scanner \
@@ -55,7 +52,9 @@ pipeline {
 
         stage('Deploy Container') {
             steps {
-                sh 'docker run -d -p 8000:8000 fastapi-app:latest'
+                sh 'docker stop fastapi-app || true'
+                sh 'docker rm fastapi-app || true'
+                sh 'docker run -d --name fastapi-app -p 8000:8000 fastapi-app:latest'
             }
         }
     }
