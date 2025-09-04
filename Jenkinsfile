@@ -28,7 +28,7 @@ pipeline {
 
         stage('Run Tests & Coverage') {
             steps {
-                sh 'pytest --cov=app tests/ --cov-report=xml:coverage.xml'
+                sh 'PYTHONPATH=. pytest --cov=app tests/ --cov-report=xml:coverage.xml'
             }
         }
 
