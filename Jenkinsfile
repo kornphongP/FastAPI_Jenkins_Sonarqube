@@ -49,6 +49,15 @@ pipeline {
             }
         }
 
+        stage('Quality Gate') {
+            steps {
+                // รอผล Quality Gate จาก SonarQube
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t fastapi-app:latest .'
