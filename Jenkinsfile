@@ -40,7 +40,7 @@ pipeline {
                             sonar-scanner \
                                 -Dsonar.projectKey=fastapi-app \
                                 -Dsonar.sources=. \
-                                -Dsonar.host.url=http://host.docker.internal:9000 \
+                                -Dsonar.host.url=http://host.docker.internal:9001 \
                                 -Dsonar.login=${SONARQUBE} \
                         """
                     }
