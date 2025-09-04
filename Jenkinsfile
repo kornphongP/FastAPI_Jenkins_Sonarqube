@@ -19,12 +19,11 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'pip install --upgrade pip'
-                sh 'pip install -r requirements.txt'
-                sh 'pip install sonar-scanner coverage pytest'
+                sh 'python -m pip install --upgrade pip --break-system-packages'
+                sh 'python -m pip install -r requirements.txt --break-system-packages'
+                sh 'python -m pip install sonar-scanner coverage pytest --break-system-packages'
             }
         }
-
 
         stage('Run Tests & Coverage') {
             steps {
@@ -38,9 +37,9 @@ pipeline {
                    sh '''
                    sonar-scanner \
                       -Dsonar.projectKey=fast-api-jenkins-sonarqube \
-                      -Dsonar.sources=. \
+                      -Dsonar.sources=app \
                       -Dsonar.host.url=http://host.docker.internal:9001 \
-                      -Dsonar.token=sqp_24e637ccced59d7a8c88d123f73f731e9c30cc05
+                      -Dsonar.token=$SONARQUBE
                    '''
                 }
             }
