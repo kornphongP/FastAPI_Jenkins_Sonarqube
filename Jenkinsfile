@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker { 
-            image 'python:3.11' 
-            args '-v /var/run/docker.sock:/var/run/docker.sock' // ใช้ Docker ของ host
-        }
-    }
+    agent any  // ใช้ Jenkins node ที่มี Docker CLI
 
     environment {
         SONARQUBE = credentials('sonar-token')   // token จาก Jenkins Credentials
@@ -17,15 +12,17 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-              sh 'python -m pip install -r requirements.txt --break-system-packages'
-              sh 'python -m pip install coverage pytest --break-system-packages'
+        stage('Install Dependencies & Run Tests') {
+            agent {
+                docker {
+                    image 'python:3.11'
+                    args '-u root:root'   // รันเป็น root จะติดตั้ง pip ได้
+                }
             }
-        }
-
-        stage('Run Tests & Coverage') {
             steps {
+                sh 'pip install --upgrade pip'
+                sh 'pip install -r requirements.txt'
+                sh 'pip install coverage pytest'
                 sh 'PYTHONPATH=. pytest --cov=app tests/ --cov-report=xml:coverage.xml'
             }
         }
@@ -33,16 +30,16 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                   sh '''
-                   docker run --rm \
-                       -v "$PWD:/usr/src" \
-                       -w /usr/src \
-                       sonarsource/sonar-scanner-cli \
-                       -Dsonar.projectKey=fast-api-jenkins-sonarqube \
-                       -Dsonar.sources=. \
-                       -Dsonar.host.url=http://host.docker.internal:9001 \
-                       -Dsonar.login=$SONARQUBE
-                   '''
+                    // ใช้ Docker image ของ SonarScanner แยกออกจาก Python container
+                    docker.image('sonarsource/sonar-scanner-cli').inside {
+                        sh """
+                            sonar-scanner \
+                                -Dsonar.projectKey=fast-api-jenkins-sonarqube \
+                                -Dsonar.sources=. \
+                                -Dsonar.host.url=http://host.docker.internal:9001 \
+                                -Dsonar.login=${SONARQUBE}
+                        """
+                    }
                 }
             }
         }
@@ -55,16 +52,9 @@ pipeline {
 
         stage('Deploy Container') {
             steps {
-                script {
-                    // รัน container บน host และ bind 0.0.0.0 เพื่อเข้าถึงจาก browser
-                    sh '''
-                    docker run -d \
-                        --name fastapi-app \
-                        -p 8000:8000 \
-                        fastapi-app:latest \
-                        uvicorn app.main:app --host 0.0.0.0 --port 8000
-                    '''
-                }
+                sh 'docker stop fastapi-app || true'
+                sh 'docker rm fastapi-app || true'
+                sh 'docker run -d --name fastapi-app -p 8000:8000 fastapi-app:latest'
             }
         }
     }
