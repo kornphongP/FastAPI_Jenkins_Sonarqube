@@ -9,7 +9,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/kornphongP/FastAPI_Jenkins_Sonarqube.git'
+                git branch: 'feature/sonarqube-test', url: 'https://github.com/kornphongP/FastAPI_Jenkins_Sonarqube.git'
             }
         }
 
