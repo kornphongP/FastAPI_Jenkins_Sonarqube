@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker { 
             image 'python:3.11' 
-            args '-v /var/run/docker.sock:/var/run/docker.sock' 
+            args '-u root:root'
         }
     }
 
@@ -19,9 +19,9 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'pip install --upgrade --user pip'
-                sh 'pip install --user -r requirements.txt'
-                sh 'pip install --user sonar-scanner coverage pytest'
+                sh 'pip install --upgrade pip'
+                sh 'pip install -r requirements.txt'
+                sh 'pip install sonar-scanner coverage pytest'
             }
         }
 
