@@ -34,7 +34,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
+                withSonarQubeEnv('SonarQubeServer') {  // ✅ ชื่อ SonarQube server ที่ตั้งค่าใน Jenkins
                     sh '''
                         docker run --rm \
                           -v E:\\work_unv\\mobile_dev\\fast_api_jenkins_sonarqube:/usr/src \
