@@ -21,7 +21,7 @@ pipeline {
             steps {
                 sh 'python -m pip install --upgrade pip --break-system-packages'
                 sh 'python -m pip install -r requirements.txt --break-system-packages'
-                sh 'python -m pip install sonar-scanner coverage pytest --break-system-packages'
+                sh 'python -m pip install coverage pytest --break-system-packages'
             }
         }
 
@@ -34,13 +34,15 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                   sh '''
-                   sonar-scanner \
-                      -Dsonar.projectKey=fast-api-jenkins-sonarqube \
-                      -Dsonar.sources=app \
-                      -Dsonar.host.url=http://host.docker.internal:9001 \
-                      -Dsonar.token=$SONARQUBE
-                   '''
+                    docker.image('sonarsource/sonar-scanner-cli').inside {
+                        sh """
+                            sonar-scanner \
+                                -Dsonar.projectKey=fast-api-jenkins-sonarqube \
+                                -Dsonar.sources=. \
+                                -Dsonar.host.url=http://host.docker.internal:9001 \
+                                -Dsonar.login=${SONARQUBE}
+                        """
+                    }
                 }
             }
         }
