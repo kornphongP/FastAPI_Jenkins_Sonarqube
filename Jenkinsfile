@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker { 
             image 'python:3.11' 
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
+            args '-u 0 -v /var/run/docker.sock:/var/run/docker.sock'  // ✅ mount docker socket to run docker commands
         }
     }
 
