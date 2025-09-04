@@ -36,7 +36,9 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
-                        sonar-scanner \
+                        docker run --rm \
+                          -v E:\\work_unv\\mobile_dev\\fast_api_jenkins_sonarqube:/usr/src \
+                          sonarsource/sonar-scanner-cli \
                           -Dsonar.projectKey=fast-api-jenkins-sonarqube \
                           -Dsonar.sources=app \
                           -Dsonar.host.url=http://host.docker.internal:9001 \
