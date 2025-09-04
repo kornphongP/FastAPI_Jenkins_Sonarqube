@@ -19,9 +19,9 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'python -m pip install --upgrade pip --break-system-packages'
-                sh 'python -m pip install -r requirements.txt --break-system-packages'
-                sh 'python -m pip install coverage pytest --break-system-packages'
+                sh 'python -m pip install --upgrade --user pip'
+                sh 'python -m pip install --user -r requirements.txt'
+                sh 'python -m pip install --user coverage pytest'
             }
         }
 
