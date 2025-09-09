@@ -54,6 +54,22 @@ pipeline {
             }
         }
 
+        stage('Push to Registry') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-cred',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker tag fastapi-app:latest $DOCKER_USER/fastapi-app:latest
+                        docker push $DOCKER_USER/fastapi-app:latest
+                    '''
+                }
+            }
+        }
+        
         stage('Deploy Container') {
             steps {
                 // stop & remove container เดิมถ้ามี
